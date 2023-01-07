@@ -12,8 +12,8 @@ pipeline {
         stage('Tomcat Install and Configuration') {
             steps {
                 sh 'echo installing tomcat server....'
-                sh 'chmod 755 ${WORKSPACE}/Tomcat_installation/Jenkinsfile'
-                sh '${WORKSPACE}/Tomcat_installation/Jenkinsfile'
+                sh 'chmod 755 ${WORKSPACE}/tomcat_installation/hello-world-war/Jenkinsfile'
+                sh '${WORKSPACE}/tomcat_installation/hello-world-war/Jenkinsfile'
                 sh 'echo installed the tomcat server succesfully....'
             }
         }
