@@ -1,40 +1,18 @@
-pipeline {
-    agent {
-        label "tomcat"        
-    }
-    stages {
-        stage('clone') {
-            steps {
-                sh 'rm -rf Automation'
-                sh 'git clone https://github.com/VandanaVinay/hello-world-war.git'
-            }
-        }
-        stage('Tomcat Install and Configuration') {
-            steps {
-                sh 'echo installing tomcat server....'
-                sh 'chmod 755 ${WORKSPACE}/tomcat_installation/hello-world-war/Jenkinsfile'
-                sh '${WORKSPACE}/tomcat_installation/hello-world-war/Jenkinsfile'
-                sh 'echo installed the tomcat server succesfully....'
-            }
-        }
-        stage('codeclone') {
-            steps {
-                sh 'rm -rf hello-world-war'
-                sh 'git clone https://github.com/VandanaVinay/hello-world-war.git'
-            }
-        }
-        stage('build') {
-            steps {
-                dir('hello-world-war') {
-                sh 'mvn  package'
-                }
-            }
-        }
-        stage('build deploy') {
-            steps {
-                sh 'sudo cp ${WORKSPACE}/hello-world-war/target/hello-world-war-1.0.0.war /var/lib/tomcat9/webapps'
-             
-            }
-       }
-    }
-}
+#!/bin/bash
+sudo apt-cache search tomcat
+sudo apt install tomcat9 tomcat9-admin
+sudo ufw allow from any to any port 9090 proto tcp
+# changing the port number
+sudo sed -i 's/port="8080"/port="9090"/g' /etc/tomcat9/server.xml
+# including the configurations in users.xml file
+sudo sh -c "echo '<role rolename=\"admin-gui\"/>' >> /etc/tomcat9/tomcat-users.xml"
+
+sudo sh -c "echo '<role rolename=\"manager-gui\"/>' >> /etc/tomcat9/tomcat-users.xml"
+
+sudo sh -c "echo '<user username=\"tomcat\" password=\"pass\" roles=\"admin-gui,manager-gui\"/>' >> /etc/tomcat9/tomcat-users.xml"
+
+# Restarting the tomcat
+sudo systemctl restart tomcat9
+# giving passwordless access
+sudo sh -c "echo 'jenkins ALL=(ALL) NOPASSWD: /var/lib/jenkins/workspace' >> /etc/sudoers"
+sudo sh -c "echo 'jenkins ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"
